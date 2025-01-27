@@ -25,6 +25,7 @@ jobs:
       
       - run: echo "✅ Check the Shopify Theme"
       - name: Theme Check
-        uses: shopify/theme-check-action@v2
+        run: |
+          shopify theme check --fail-level=error
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
