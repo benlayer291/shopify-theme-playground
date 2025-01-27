@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v2.x
+        uses: rlespinasse/github-slug-action@v3.x
 
       - run: echo "🛒 Check out the repository code for the branch ${{ env.GITHUB_HEAD_REF_SLUG_URL }}"
       - name: Check out repository code
