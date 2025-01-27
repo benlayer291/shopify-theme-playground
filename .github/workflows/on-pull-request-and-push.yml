@@ -30,7 +30,7 @@ jobs:
 
       - run: echo "🧪 Install the Shopify CLI"
       - name: Install Shopify CLI
-        run: npm install -g @shopify/cli@latest
+        run: npm install -g @shopify/cli@3.70.0
 
       - run: shopify --version
 
