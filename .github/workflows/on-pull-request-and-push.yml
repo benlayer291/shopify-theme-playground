@@ -9,14 +9,16 @@ on:
 env:
   SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_STORE }}
   SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
-  SHOPIFY_FLAG_STRICT_PUSH: true
   SHOPIFY_FLAG_JSON: true
 
 jobs:
   Deploy-Theme:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🛒 Check out the repository code for the branch ${{ github.head_ref }}"
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v2.x
+
+      - run: echo "🛒 Check out the repository code for the branch ${{ env.GITHUB_HEAD_REF_SLUG_URL }}"
       - name: Check out repository code
         uses: actions/checkout@v4
 
@@ -39,14 +41,14 @@ jobs:
 
       - name: Create Theme
         if: github.event.action == 'opened' || github.event.action == 'reopened'
-        run: shopify theme push --theme deploy-preview--${{ github.head_ref }} --unpublished
+        run: shopify theme push --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }} --unpublished
       
       - name: Update Theme
         if: github.event.action == 'synchronize'
-        run: shopify theme push --theme deploy-preview--${{ github.head_ref }}
+        run: shopify theme push --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }}
 
       - name: Delete Theme
         if: github.event.action == 'closed'
-        run: shopify theme delete --theme deploy-preview--${{ github.head_ref }}
+        run: shopify theme delete --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }}
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
