@@ -30,13 +30,20 @@ jobs:
       - run: echo "🧪 Install the Shopify CLI"
       - name: Install Shopify CLI
         run: npm install -g @shopify/cli
+
+      - run: echo "🍏 This action's event is ${{ github.event.action }}."
+
+      - name: Delete Theme
+        if: github.event.action == 'closed'
+        run: |
+          shopify theme delete --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }}
+          echo "Pull request action is 'closed'. Exiting early with success."
+          exit 0
       
       - run: echo "✅ Check the Shopify Theme"
       - name: Theme Check
         run: |
           shopify theme check --fail-level=error
-
-      - run: echo "🍏 This action's event is ${{ github.event.action }}."
 
       - name: Create Theme
         if: github.event.action == 'opened' || github.event.action == 'reopened'
@@ -45,13 +52,6 @@ jobs:
       - name: Update Theme
         if: github.event.action == 'synchronize'
         run: shopify theme push --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }} --json > theme_push_output.json
-
-      - name: Delete Theme
-        if: github.event.action == 'closed'
-        run: |
-          shopify theme delete --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }}
-          echo "Pull request action is 'closed'. Exiting early with success."
-          exit 0
 
       - name: Generate Deploy Preview Link
         run: |
