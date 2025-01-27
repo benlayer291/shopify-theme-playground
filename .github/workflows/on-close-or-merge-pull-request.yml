@@ -30,7 +30,7 @@ jobs:
 
       - run: echo "🧪 Install the Shopify CLI"
       - name: Install Shopify CLI
-        run: npm install -g @shopify/cli
+        run: npm install -g @shopify/cli@latest
 
       - run: echo "🍏 This action's event is ${{ github.event.action }}."
 
