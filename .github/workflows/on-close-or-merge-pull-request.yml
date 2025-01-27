@@ -12,7 +12,7 @@ env:
   SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
 
 jobs:
-  Deploy-Theme:
+  Delete-Theme:
     runs-on: ubuntu-latest
     steps:
       - name: Inject slug/short variables
@@ -37,6 +37,4 @@ jobs:
       - name: Delete Theme
         if: github.event.action == 'closed'
         run: |
-          shopify theme delete --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }}
-          echo "Pull request action is 'closed'. Exiting early with success."
-          exit 0
+          shopify theme delete --force --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }}
