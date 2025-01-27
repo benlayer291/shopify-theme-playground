@@ -40,11 +40,11 @@ jobs:
 
       - name: Create Theme
         if: github.event.action == 'opened' || github.event.action == 'reopened'
-        run: shopify theme push --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }} --unpublished
+        run: shopify theme push --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }} --unpublished --json
       
       - name: Update Theme
         if: github.event.action == 'synchronize'
-        run: shopify theme push --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }}
+        run: shopify theme push --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }} --json
 
       - name: Delete Theme
         if: github.event.action == 'closed'
