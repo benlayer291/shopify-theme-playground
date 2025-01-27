@@ -63,7 +63,6 @@ jobs:
       - name: Comment Deploy Preview Link on PR
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          hide_and_recreate: true
-          hide_classify: "OUTDATED"
+          recreate: true
           message: |
             🚀 Shopify Theme Preview Link: ${{ env.theme_deploy_preview_url }}
