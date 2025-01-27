@@ -1,0 +1,42 @@
+name: On Pull Request Close or Merge
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [ closed ]
+  
+
+env:
+  SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_STORE }}
+  SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
+
+jobs:
+  Deploy-Theme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+
+      - run: echo "🛒 Check out the repository code for the branch ${{ github.head_ref }}"
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - run: echo "💽 Install node"
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: echo "🧪 Install the Shopify CLI"
+      - name: Install Shopify CLI
+        run: npm install -g @shopify/cli
+
+      - run: echo "🍏 This action's event is ${{ github.event.action }}."
+
+      - name: Delete Theme
+        if: github.event.action == 'closed'
+        run: |
+          shopify theme delete --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }}
+          echo "Pull request action is 'closed'. Exiting early with success."
+          exit 0

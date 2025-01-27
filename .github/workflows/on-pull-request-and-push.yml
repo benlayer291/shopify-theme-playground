@@ -1,9 +1,10 @@
-name: On Pull Request and Push
+name: On Pull Request Open, Reopen and Synchronize
 
 on:
   pull_request:
     branches:
       - main
+    types: [ opened, reopened, synchronize ]
   workflow_dispatch:
 
 env:
@@ -32,13 +33,6 @@ jobs:
         run: npm install -g @shopify/cli
 
       - run: echo "🍏 This action's event is ${{ github.event.action }}."
-
-      - name: Delete Theme
-        if: github.event.action == 'closed'
-        run: |
-          shopify theme delete --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }}
-          echo "Pull request action is 'closed'. Exiting early with success."
-          exit 0
       
       - run: echo "✅ Check the Shopify Theme"
       - name: Theme Check
