@@ -56,7 +56,7 @@ jobs:
       - name: Generate Deploy Preview Link
         run: |
           THEME_ID=$(jq -r '.theme.id' theme_push_output.json)
-          THEME_URL="https://${{ secrets.SHOPIFY_FLAG_STORE }}?preview_theme_id=$THEME_ID"
+          THEME_URL="https://${{ env.SHOPIFY_FLAG_STORE }}?preview_theme_id=$THEME_ID"
           echo "Theme Deploy Preview Link: $THEME_URL"
           echo "theme_deploy_preview_url=$THEME_URL" >> $GITHUB_ENV
 
@@ -66,4 +66,4 @@ jobs:
           hide_and_recreate: true
           hide_classify: "OUTDATED"
           message: |
-            🚀 Shopify Theme Preview Link: [Preview Theme Here](${{ env.theme_deploy_preview_url }})
+            🚀 Shopify Theme Preview Link: ${{ env.theme_deploy_preview_url }}
