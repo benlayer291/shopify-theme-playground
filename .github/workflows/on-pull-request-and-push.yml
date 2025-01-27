@@ -1,10 +1,16 @@
-name: GitHub Action Setup
-run-name: ${{ github.actor }} is setting up GitHub Actions 🚀
+name: On Pull Request and Push
+
 on:
   pull_request:
     branches:
       - main
   workflow_dispatch:
+
+env:
+  SHOPIFY_FLAG_STRICT_PUSH: true
+  SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_STORE }}
+  SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
+
 jobs:
   Deploy-Theme:
     runs-on: ubuntu-latest
@@ -27,5 +33,24 @@ jobs:
       - name: Theme Check
         run: |
           shopify theme check --fail-level=error
+      
+      - name: Update Theme
+        if: github.event.action == 'synchronize'
+        run: shopify theme push \
+          --json
+          --theme deploy-preview--${{ github.head_ref }}
+
+      - name: Create Theme
+        if: github.event.action == 'opened' || github.event.action == 'reopened'
+        run: shopify theme push \
+          --json
+          --theme deploy-preview--${{ github.head_ref }}
+          --unpublished
+
+      - name: Delete Theme
+        if: github.event.action == 'closed'
+        run: shopify theme delete
+          --json
+          --theme deploy-preview--${{ github.head_ref }}
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
