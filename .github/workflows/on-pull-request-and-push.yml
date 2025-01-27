@@ -40,14 +40,28 @@ jobs:
 
       - name: Create Theme
         if: github.event.action == 'opened' || github.event.action == 'reopened'
-        run: shopify theme push --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }} --unpublished --json
+        run: shopify theme push --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }} --unpublished --json > theme_push_output.json
       
       - name: Update Theme
         if: github.event.action == 'synchronize'
-        run: shopify theme push --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }} --json
+        run: shopify theme push --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }} --json > theme_push_output.json
 
       - name: Delete Theme
         if: github.event.action == 'closed'
-        run: shopify theme delete --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }}
+        run: |
+          shopify theme delete --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }}
+          echo "Pull request action is 'closed'. Exiting early with success."
+          exit 0
 
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: Generate Deploy Preview Link
+        run: |
+          THEME_ID=$(jq -r '.theme.id' deploy_output.json)
+          THEME_URL="https://${{ secrets.SHOPIFY_STORE_URL }}?preview_theme_id=$THEME_ID"
+          echo "Theme Deploy Preview Link: $THEME_URL"
+          echo "theme_deploy_preview_url=$THEME_URL" >> $GITHUB_ENV
+
+      - name: Comment Deploy Preview Link on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            🚀 Shopify Theme Preview Link: [Preview Theme Here](${{ env.theme_deploy_preview_url }})
