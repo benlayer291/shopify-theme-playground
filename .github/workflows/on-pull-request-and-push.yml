@@ -55,7 +55,7 @@ jobs:
 
       - name: Generate Deploy Preview Link
         run: |
-          THEME_ID=$(jq -r '.theme.id' deploy_output.json)
+          THEME_ID=$(jq -r '.theme.id' theme_push_output.json)
           THEME_URL="https://${{ secrets.SHOPIFY_STORE_URL }}?preview_theme_id=$THEME_ID"
           echo "Theme Deploy Preview Link: $THEME_URL"
           echo "theme_deploy_preview_url=$THEME_URL" >> $GITHUB_ENV
