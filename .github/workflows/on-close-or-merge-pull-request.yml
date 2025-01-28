@@ -29,4 +29,4 @@ jobs:
       - name: Delete Theme
         if: github.event.action == 'closed'
         run: |
-          shopify theme delete --force --theme ${{ github.repository }}/${{ github.head_ref }}
+          shopify theme delete --force --theme ${{ github.event.repository.name }}/${{ github.head_ref }}
