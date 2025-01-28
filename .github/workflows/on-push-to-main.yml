@@ -1,0 +1,60 @@
+name: On Push to Main
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_STORE }}
+  SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
+
+jobs:
+  Deploy-Theme:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🛒 Check out the repository code for the branch ${{ github.head_ref }}"
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - run: echo "💽 Install node"
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: echo "🧪 Install the Shopify CLI"
+      - name: Install Shopify CLI
+        run: npm install -g @shopify/cli
+
+      - run: echo "✅ Check the Shopify Theme"
+      - name: Theme Check
+        run: |
+          shopify theme check --fail-level=error
+
+      - name: Push or Create and Push Theme
+        run: |
+          THEME_NAME="${{ github.repository }}/${{ github.head_ref }}"
+          EXISTING_THEME=$(shopify theme list --json | jq -r --arg THEME_NAME "$THEME_NAME" '.[] | select(.name == $THEME_NAME) | .id')
+          if [ -z "$EXISTING_THEME" ]; then
+            echo "Theme does not exist. Creating new unpublished theme."
+            shopify theme push --unpublished --theme "$THEME_NAME" --json > theme_push_output.json
+          else
+            echo "Theme exists. Pushing to existing theme."
+            shopify theme push --theme "$THEME_NAME" --json > theme_push_output.json
+          fi
+
+      - name: Generate Deploy Preview Link
+        run: |
+          THEME_ID=$(jq -r '.theme.id' theme_push_output.json)
+          THEME_URL="https://${{ env.SHOPIFY_FLAG_STORE }}?preview_theme_id=$THEME_ID"
+          echo "Theme Deploy Preview Link: $THEME_URL"
+          echo "theme_deploy_preview_url=$THEME_URL" >> $GITHUB_ENV
+
+      - name: Comment Deploy Preview Link
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          message: |
+            🚀 Shopify Theme Preview Link: ${{ env.theme_deploy_preview_url }}
