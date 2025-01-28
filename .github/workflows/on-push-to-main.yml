@@ -31,7 +31,7 @@ jobs:
 
       - name: Push or Create and Push Theme
         run: |
-          THEME_NAME="${{ github.event.repository.name }}/${{ github.head_ref }}"
+          THEME_NAME="${{ github.event.repository.name }}/${{ github.ref }}"
           EXISTING_THEME=$(shopify theme list --json | jq -r --arg THEME_NAME "$THEME_NAME" '.[] | select(.name == $THEME_NAME) | .id')
           if [ -z "$EXISTING_THEME" ]; then
             echo "Theme does not exist. Creating new unpublished theme."
