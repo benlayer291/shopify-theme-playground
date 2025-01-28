@@ -15,26 +15,18 @@ jobs:
   Delete-Theme:
     runs-on: ubuntu-latest
     steps:
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v3.x
-
-      - run: echo "🛒 Check out the repository code for the branch ${{ github.head_ref }}"
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      - run: echo "💽 Install node"
       - name: Install node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - run: echo "🧪 Install the Shopify CLI"
       - name: Install Shopify CLI
         run: npm install -g @shopify/cli@latest
-
-      - run: echo "🍏 This action's event is ${{ github.event.action }}."
 
       - name: Delete Theme
         if: github.event.action == 'closed'
         run: |
-          shopify theme delete --force --theme deploy-preview--${{ env.GITHUB_HEAD_REF_SLUG_URL }}
+          shopify theme delete --force --theme ${{ github.repository }}/${{ github.head_ref }}
