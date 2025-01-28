@@ -10,6 +10,8 @@ env:
   SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_STORE }}
   SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
 
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   Deploy-Theme:
     runs-on: ubuntu-latest
@@ -29,7 +31,7 @@ jobs:
         run: |
           shopify theme check --fail-level=error
 
-      - name: Push or Create and Push Theme
+      - name: Push Theme or Create and Push Theme
         run: |
           THEME_NAME="${{ github.event.repository.name }}/${{ github.event.repository.default_branch }}"
           EXISTING_THEME=$(shopify theme list --json | jq -r --arg THEME_NAME "$THEME_NAME" '.[] | select(.name == $THEME_NAME) | .id')
@@ -40,3 +42,19 @@ jobs:
             echo "Theme exists. Pushing to existing theme."
             shopify theme push --theme "$THEME_NAME" --json > theme_push_output.json
           fi
+      
+      - name: Generate Deployment Link
+        run: |
+          THEME_ID=$(jq -r '.theme.id' theme_push_output.json)
+          THEME_URL="https://${{ env.SHOPIFY_FLAG_STORE }}?preview_theme_id=$THEME_ID"
+          echo "Theme Deployment Link: $THEME_URL"
+          echo "theme_deployment_url=$THEME_URL" >> $GITHUB_ENV
+      
+      - name: Create GitHub Release
+        run: |
+          RELEASE_TAG="release-${{ github.run_number }}"
+          RELEASE_NAME="Shopify Theme Deployment - Run ${{ github.run_number }}"
+          gh release create "$RELEASE_TAG" \
+            --title "$RELEASE_NAME" \
+            --notes "Theme successfully deployed. ${{ env.theme_deployment_url }}" \
+            --target main
