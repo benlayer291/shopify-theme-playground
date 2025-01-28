@@ -14,21 +14,17 @@ jobs:
   Deploy-Theme:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🛒 Check out the repository code for the branch ${{ github.head_ref }}"
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      - run: echo "💽 Install node"
       - name: Install node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - run: echo "🧪 Install the Shopify CLI"
       - name: Install Shopify CLI
         run: npm install -g @shopify/cli
 
-      - run: echo "✅ Check the Shopify Theme"
       - name: Theme Check
         run: |
           shopify theme check --fail-level=error
