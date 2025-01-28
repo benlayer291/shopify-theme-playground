@@ -1,0 +1,32 @@
+name: On Pull Request Close or Merge
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [ closed ]
+  
+
+env:
+  SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_STORE }}
+  SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
+
+jobs:
+  Delete-Theme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Shopify CLI
+        run: npm install -g @shopify/cli@latest
+
+      - name: Delete Theme
+        if: github.event.action == 'closed'
+        run: |
+          shopify theme delete --force --theme ${{ github.event.repository.name }}/${{ github.head_ref }}

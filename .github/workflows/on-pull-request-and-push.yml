@@ -1,0 +1,53 @@
+name: On Pull Request Open, Reopen and Synchronize
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [ opened, reopened, synchronize ]
+  workflow_dispatch:
+
+env:
+  SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_STORE }}
+  SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
+
+jobs:
+  Deploy-Theme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Install node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Shopify CLI
+        run: npm install -g @shopify/cli@3.70.0
+      
+      - name: Theme Check
+        run: |
+          shopify theme check --fail-level=error
+
+      - name: Create Theme
+        if: github.event.action == 'opened' || github.event.action == 'reopened'
+        run: shopify theme push --theme ${{ github.event.repository.name }}/${{ github.head_ref }} --unpublished --json > theme_push_output.json
+      
+      - name: Update Theme
+        if: github.event.action == 'synchronize'
+        run: shopify theme push --theme ${{ github.event.repository.name }}/${{ github.head_ref }} --json > theme_push_output.json
+
+      - name: Generate Deploy Preview Link
+        run: |
+          THEME_ID=$(jq -r '.theme.id' theme_push_output.json)
+          THEME_URL="https://${{ env.SHOPIFY_FLAG_STORE }}?preview_theme_id=$THEME_ID"
+          echo "Theme Deploy Preview Link: $THEME_URL"
+          echo "theme_deploy_preview_url=$THEME_URL" >> $GITHUB_ENV
+
+      - name: Comment Deploy Preview Link on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          message: |
+            🚀 Shopify Theme Preview Link: ${{ env.theme_deploy_preview_url }}
