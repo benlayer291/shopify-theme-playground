@@ -32,7 +32,7 @@ jobs:
 
       - name: Create Theme
         if: github.event.action == 'opened' || github.event.action == 'reopened'
-        run: shopify theme push --theme ${{ github.event.repository.name }}/${{ github.head_ref }} --ignore config/settings_data.json --unpublished --json > theme_push_output.json
+        run: shopify theme push --theme ${{ github.event.repository.name }}/${{ github.head_ref }} --unpublished --json > theme_push_output.json
       
       - name: Update Theme
         if: github.event.action == 'synchronize'
