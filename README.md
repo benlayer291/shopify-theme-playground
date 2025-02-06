@@ -1,6 +1,10 @@
 ## README
 
 Shopify integration testing.
+- [x] New template created on shopify-integration before PR merged
+- [ ] Changes to template on shopify-integration before PR merged
+- [ ] Changes to theme settings on shopify-integration before PR merged
+- [ ] Update to settings_schema on branch merged to shopify integration
 
 ### Requirements
 - You've installed Shopify CLI
