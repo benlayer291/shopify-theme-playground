@@ -11,6 +11,12 @@
     "name": "t:settings_schema.logo.name",
     "settings": [
       {
+        "type": "checkbox",
+        "id": "logo_test",
+        "label": "Logo test",
+        "default": true
+      },
+      {
         "type": "image_picker",
         "id": "logo",
         "label": "t:settings_schema.logo.settings.logo_image.label"
