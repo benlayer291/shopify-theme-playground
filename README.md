@@ -4,7 +4,7 @@ Onboarding the team to Shopify.
 
 Settings update.
 
-Templates test.
+Templates test. Now with template added in Customiser.
 
 ### Requirements
 - You've installed Shopify CLI
