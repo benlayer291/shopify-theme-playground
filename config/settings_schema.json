@@ -13,7 +13,8 @@
       {
         "type": "checkbox",
         "id": "logo_test",
-        "label": "Logo test"
+        "label": "Logo test",
+        "default": true
       },
       {
         "type": "image_picker",
