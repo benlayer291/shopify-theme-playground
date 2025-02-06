@@ -3,7 +3,7 @@ name: On Pull Request Open, Reopen and Synchronize
 on:
   pull_request:
     branches:
-      - main
+      - shopify-integration
     types: [ opened, reopened, synchronize ]
   workflow_dispatch:
 

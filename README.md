@@ -1,8 +1,6 @@
 ## README
 
-Onboarding the team to Shopify.
-
-Settings update.
+Shopify integration testing.
 
 ### Requirements
 - You've installed Shopify CLI
